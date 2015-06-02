@@ -7,7 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		D73FCAEF1ADC755500383EE1 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = D73FCAEE1ADC755500383EE1 /* main.c */; };
+		D73FCAF61ADC756700383EE1 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D73FCAF51ADC756700383EE1 /* OpenGL.framework */; };
+		D73FCAF81ADC756A00383EE1 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D73FCAF71ADC756A00383EE1 /* GLUT.framework */; };
+		D7D1A4FD1ADC97720092E2BE /* cgexample.c in Sources */ = {isa = PBXBuildFile; fileRef = D7D1A4FC1ADC97720092E2BE /* cgexample.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -24,7 +26,10 @@
 
 /* Begin PBXFileReference section */
 		D73FCAEB1ADC755500383EE1 /* OpenGLTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenGLTest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D73FCAEE1ADC755500383EE1 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		D73FCAF51ADC756700383EE1 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		D73FCAF71ADC756A00383EE1 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		D7D1A4F91ADC96660092E2BE /* myglini.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = myglini.h; sourceTree = "<group>"; };
+		D7D1A4FC1ADC97720092E2BE /* cgexample.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cgexample.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +37,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D73FCAF81ADC756A00383EE1 /* GLUT.framework in Frameworks */,
+				D73FCAF61ADC756700383EE1 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -41,6 +48,8 @@
 		D73FCAE21ADC755400383EE1 = {
 			isa = PBXGroup;
 			children = (
+				D73FCAF71ADC756A00383EE1 /* GLUT.framework */,
+				D73FCAF51ADC756700383EE1 /* OpenGL.framework */,
 				D73FCAED1ADC755500383EE1 /* OpenGLTest */,
 				D73FCAEC1ADC755500383EE1 /* Products */,
 			);
@@ -57,7 +66,8 @@
 		D73FCAED1ADC755500383EE1 /* OpenGLTest */ = {
 			isa = PBXGroup;
 			children = (
-				D73FCAEE1ADC755500383EE1 /* main.c */,
+				D7D1A4FC1ADC97720092E2BE /* cgexample.c */,
+				D7D1A4F91ADC96660092E2BE /* myglini.h */,
 			);
 			path = OpenGLTest;
 			sourceTree = "<group>";
@@ -118,7 +128,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D73FCAEF1ADC755500383EE1 /* main.c in Sources */,
+				D7D1A4FD1ADC97720092E2BE /* cgexample.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,6 +245,7 @@
 				D73FCAF41ADC755500383EE1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
