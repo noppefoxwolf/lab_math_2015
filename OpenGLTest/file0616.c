@@ -214,9 +214,12 @@ void calcData(){
                             + fabs(uu[i][j][k]) / 2.0 * ( uu[i+1][j][k] - 2.0*uu[i][j][k] + uu[i-1][j][k] ) / dx
                             - vv[i][j][k] * ( uu[i][j+1][k] - uu[i][j-1][k] ) / (2.0*dy)
                             + fabs(vv[i][j][k]) / 2.0 * ( uu[i][j+1][k] - 2.0*uu[i][j][k] + uu[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( uu[i][j][k+1] - uu[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( uu[i][j][k+1] - 2.0*uu[i][j][k] + uu[i][j][k-1] ) / dz
                             - ( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx)
-                            + 1.0/Re * ( ( uu[i+1][j][k] - 2.0*uu[i][j][k] + uu[i-1][j][k] ) / (dx*dx)
+                            + 1.0/Re * (  ( uu[i+1][j][k] - 2.0*uu[i][j][k] + uu[i-1][j][k] ) / (dx*dx)
                                         + ( uu[i][j+1][k] - 2.0*uu[i][j][k] + uu[i][j-1][k] ) / (dy*dy)
+                                        + ( uu[i][j][k+1] - 2.0*uu[i][j][k] + uu[i][j][k-1] ) / (dz*dz)
                                         )
                             );
                     //非線形項の確認
@@ -226,20 +229,40 @@ void calcData(){
                             + fabs(uu[i][j][k]) / 2.0 * ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / dx
                             - vv[i][j][k] * ( vv[i][j+1][k] - vv[i][j-1][k] ) / (2.0*dy)
                             + fabs(vv[i][j][k]) / 2.0 * ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( vv[i][j][k+1] - vv[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / dz
                             - ( P[i][j+1][k] - P[i][j-1][k] ) / (2.0*dy)
-                            + 1.0/Re * ( ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / (dx*dx)
+                            + 1.0/Re * (  ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / (dx*dx)
                                         + ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / (dy*dy)
+                                        + ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / (dz*dz)
+                                        )
+                            );
+                    
+                    w[i][j][k] = ww[i][j][k]
+                    + dt * ( - uu[i][j][k] * ( ww[i+1][j][k] - ww[i-1][j][k] ) / (2.0*dx)
+                            + fabs(uu[i][j][k]) / 2.0 * ( ww[i+1][j][k] - 2.0*ww[i][j][k] + ww[i-1][j][k] ) / dx
+                            - vv[i][j][k] * ( ww[i][j+1][k] - ww[i][j-1][k] ) / (2.0*dy)
+                            + fabs(vv[i][j][k]) / 2.0 * ( ww[i][j+1][k] - 2.0*ww[i][j][k] + ww[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( ww[i][j][k+1] - ww[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( ww[i][j][k+1] - 2.0*ww[i][j][k] + ww[i][j][k-1] ) / dz
+                            - ( P[i][j+1][k] - P[i][j-1][k] ) / (2.0*dy)
+                            + 1.0/Re * (  ( ww[i+1][j][k] - 2.0*ww[i][j][k] + ww[i-1][j][k] ) / (dx*dx)
+                                        + ( ww[i][j+1][k] - 2.0*ww[i][j][k] + ww[i][j-1][k] ) / (dy*dy)
+                                        + ( ww[i][j][k+1] - 2.0*ww[i][j][k] + ww[i][j][k-1] ) / (dz*dz)
                                         )
                             );
                     
                     //ここにもTが必要
                     T[i][j][k] = TT[i][j][k]
-                    + dt * ( - uu[i][j][k] * ( TT[i+1][j][k] - TT[i-1][j][k] ) / (2.0*dx)
+                    + dt * (- uu[i][j][k] * ( TT[i+1][j][k] - TT[i-1][j][k] ) / (2.0*dx)
                             + fabs(uu[i][j][k]) / 2.0 * ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / dx
                             - vv[i][j][k] * ( TT[i][j+1][k] - TT[i][j-1][k] ) / (2.0*dy)
                             + fabs(vv[i][j][k]) / 2.0 * ( TT[i][j+1][k] - 2.0*TT[i][j][k] + TT[i][j-1][k] ) / dy
-                            + 1.0/(Re*Pr) * ( ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / (dx*dx)
+                            - ww[i][j][k] * ( TT[i][j][k+1] - TT[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( TT[i][j][k+1] - 2.0*TT[i][j][k] + TT[i][j][k-1] ) / dz
+                            + 1.0/(Re*Pr) * (  ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / (dx*dx)
                                              + ( TT[i][j+1][k] - 2.0*TT[i][j][k] + TT[i][j-1][k] ) / (dy*dy)
+                                             + ( TT[i][j][k+1] - 2.0*TT[i][j][k] + TT[i][j][k-1] ) / (dz*dz)
                                              )
                             );
                 }
@@ -250,38 +273,63 @@ void calcData(){
             for(i = 1; i < imax; i++){
                 for(j = 1; j < jmax; j++){//ここにもkを足す
                     for(k = 1; k < kmax; k++){//ここにもkを足す
-                        A = - 1.0 * ( u[i+1][j][k] - u[i-1][j][k] ) / (2.0*dx) * ( u[i+1][j][k] - u[i-1][j][k] ) / (2.0*dx)
+                        A =
+                        - 1.0 * ( u[i+1][j][k] - u[i-1][j][k] ) / (2.0*dx) * ( u[i+1][j][k] - u[i-1][j][k] ) / (2.0*dx)
                         - 1.0 * ( v[i][j+1][k] - v[i][j-1][k] ) / (2.0*dy) * ( v[i][j+1][k] - v[i][j-1][k] ) / (2.0*dy)
-                        - 2.0 * ( u[i][j+1][k] - u[i][j-1][k] ) / (2.0*dy) * ( v[i+1][j][k] - v[i-1][j][k] ) / (2.0*dx)
-                        + 1.0/dt * ( ( u[i+1][j][k] - u[i-1][j][k] ) / (2.0*dx) + ( v[i][j+1][k] - v[i][j-1][k] ) / (2.0*dy) );
-                        B = - ( P[i+1][j][k] + P[i-1][j][k] ) / (dx*dx) - ( P[i][j+1][k] + P[i][j-1][k] ) / (dy*dy) + A;
-                        P[i][j][k] = B / ( - 2.0 / (dx*dx) - 2.0 / (dy*dy) );
+                        - 1.0 * ( w[i][j][k+1] - w[i][j][k-1] ) / (2.0*dz) * ( w[i][j][k+1] - w[i][j][k-1] ) / (2.0*dz)
+                        
+                        - 2.0 * ( u[i][j+1][k] - u[i][j-1][k] ) / (2.0*dy)
+                              * ( v[i+1][j][k] - v[i-1][j][k] ) / (2.0*dx)
+                        - 2.0 * ( u[i][j][k+1] - u[i][j][k-1] ) / (2.0*dz)
+                              * ( w[i+1][j][k] - w[i-1][j][k] ) / (2.0*dx)
+                        - 2.0 * ( v[i][j][k+1] - v[i][j][k-1] ) / (2.0*dz)
+                              * ( w[i][j+1][k] - w[i][j-1][k] ) / (2.0*dy)
+                        + 1.0/dt * (
+                                    ( u[i+1][j][k] - u[i-1][j][k] ) / (2.0*dx) +
+                                    ( v[i][j+1][k] - v[i][j-1][k] ) / (2.0*dy) +
+                                    ( w[i][j][k+1] - w[i][j][k-1] ) / (2.0*dz)
+                                    );//TODO
+                        
+                        B = - ( P[i+1][j][k] + P[i-1][j][k] ) / (dx*dx)
+                            - ( P[i][j+1][k] + P[i][j-1][k] ) / (dy*dy)
+                            - ( P[i][j][k+1] + P[i][j][k-1] ) / (dz*dz) + A;
+                        P[i][j][k] = B / ( - 2.0 / (dx*dx) - 2.0 / (dy*dy) - 2.0 / (dz*dz) );
                     }
                 }
             }
         }
         
-        // 課題ノートの[4]
+        // 境界条件
         for(j = 0; j <= jmax; j++){
-            P[0][j][k] = P[1][j][k];
-            P[imax][j][k] = P[imax-1][j][k];
+            for(k = 0; k <= kmax; k++){
+                P[0][j][k] = P[1][j][k];
+                P[imax][j][k] = P[imax-1][j][k];
+            }
         }
         for(i = 0; i <= imax; i++){
-            P[i][0][k] = P[i][1][k];
-            P[i][jmax][k] = P[i][jmax-1][k];
+            for(k = 0; k <= kmax; k++){
+                P[i][0][k] = P[i][1][k];
+                P[i][jmax][k] = P[i][jmax-1][k];
+            }
+        }
+        for(i = 0; i <= imax; i++){
+            for(j = 0; j <= jmax; j++){
+                P[i][j][0] = P[i][j][1];
+                P[i][j][kmax] = P[i][j][kmax-1];
+            }
         }
         
         char filename[20] = {'\0'};
         snprintf(filename, 20, "paraview_%d.csv",n);
         FILE *fp = fopen(filename, "w");
-        fprintf(fp, "t,x,y,u,v,P,\n");
+        fprintf(fp, "t,x,y,z,u,v,w,T,\n");
         // 時刻n*dt(第n回目時点)の書き込み
         int flag = 0;
         for(i = 0; i <= imax; i++){
             for(j = 0; j <= jmax; j++){
                 for (k = 0; k <= kmax; k++) {
                     if (flag == 0){
-                        fprintf(fp, "%f,%f,%f,%f,%f,%f,\n", n*dt,i*dx, j*dy, u[i][j][k], v[i][j][k], P[i][j][k]);
+                        fprintf(fp, "%f,%f,%f,%f,%f,%f,%f,%f,\n", n*dt,i*dx,j*dy,k*dz,u[i][j][k],v[i][j][k],w[i][j][k], T[i][j][k]);
                         flag = 1;
                     }if (flag == 1){
                         flag = 2;
