@@ -133,10 +133,12 @@ void calcData(){
                     //上流差分
                     float udTdx  = uu[i][j][k] * (-TT[i+2][j][k]+8*(TT[i+1][j][k]-TT[i-1][j][k])+TT[i-2][j][k])/(12*dx) + (fabs(uu[i][j][k])*powf(dx, 3)/12.0)*(TT[i+2][j][k]-4*TT[i+1][j][k]+6*TT[i][j][k]-4*TT[i-1][j][k]+TT[i-2][j][k])/powf(dt, 4);//P183の7.75;
                     float vdTdy  = vv[i][j][k] * (-TT[i][j+2][k]+8*(TT[i][j+1][k]-TT[i][j-1][k])+TT[i][j-2][k])/(12*dy) + (fabs(vv[i][j][k])*powf(dy, 3)/12.0)*(TT[i][j+2][k]-4*TT[i][j+1][k]+6*TT[i][j][k]-4*TT[i][j-1][k]+TT[i][j-2][k])/powf(dy, 4);//P183の7.75;
+                    float wdTdy  = ww[i][j][k] * (-TT[i][j][k+2]+8*(TT[i][j][k+1]-TT[i][j][k-1])+TT[i][j][k-2])/(12*dz) + (fabs(ww[i][j][k])*powf(dz, 3)/12.0)*(TT[i][j][k+2]-4*TT[i][j][k+1]+6*TT[i][j][k]-4*TT[i][j][k-1]+TT[i][j][k-2])/powf(dz, 4);//P183の7.75;
                     float d2Tdx2 = ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / dx2;
                     float d2Tdy2 = ( TT[i][j+1][k] - 2.0*TT[i][j][k] + TT[i][j-1][k] ) / dy2;
+                    float d2Tdz2 = ( TT[i][j][k+1] - 2.0*TT[i][j][k] + TT[i][j][k-1] ) / dz2;
                     
-                    T[i][j][k] = TT[i][j][k] + dt * ( -udTdx - vdTdy + 1.0/(Re*Pr)*(d2Tdx2 + d2Tdy2));
+                    T[i][j][k] = TT[i][j][k] + dt * ( -udTdx - vdTdy -wdTdy + 1.0/(Re*Pr)*(d2Tdx2 + d2Tdy2 + d2Tdz2));
                 }
             }
         }
@@ -149,9 +151,12 @@ void calcData(){
                             + fabs(uu[i][j][k]) / 2.0 * ( uu[i+1][j][k] - 2.0*uu[i][j][k] + uu[i-1][j][k] ) / dx
                             - vv[i][j][k] * ( uu[i][j+1][k] - uu[i][j-1][k] ) / (2.0*dy)
                             + fabs(vv[i][j][k]) / 2.0 * ( uu[i][j+1][k] - 2.0*uu[i][j][k] + uu[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( uu[i][j][k+1] - uu[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( uu[i][j][k+1] - 2.0*uu[i][j][k] + uu[i][j][k-1] ) / dz
                             - ( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx)
-                            + 1.0/Re * ( ( uu[i+1][j][k] - 2.0*uu[i][j][k] + uu[i-1][j][k] ) / (dx*dx)
+                            + 1.0/Re * (  ( uu[i+1][j][k] - 2.0*uu[i][j][k] + uu[i-1][j][k] ) / (dx*dx)
                                         + ( uu[i][j+1][k] - 2.0*uu[i][j][k] + uu[i][j-1][k] ) / (dy*dy)
+                                        + ( uu[i][j][k+1] - 2.0*uu[i][j][k] + uu[i][j][k-1] ) / (dz*dz)
                                         )
                             );
                     //非線形項の確認
@@ -161,20 +166,40 @@ void calcData(){
                             + fabs(uu[i][j][k]) / 2.0 * ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / dx
                             - vv[i][j][k] * ( vv[i][j+1][k] - vv[i][j-1][k] ) / (2.0*dy)
                             + fabs(vv[i][j][k]) / 2.0 * ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( vv[i][j][k+1] - vv[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / dz
                             - ( P[i][j+1][k] - P[i][j-1][k] ) / (2.0*dy)
-                            + 1.0/Re * ( ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / (dx*dx)
+                            + 1.0/Re * (  ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / (dx*dx)
                                         + ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / (dy*dy)
+                                        + ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / (dz*dz)
+                                        )
+                            );
+                    
+                    w[i][j][k] = ww[i][j][k]
+                    + dt * ( - uu[i][j][k] * ( ww[i+1][j][k] - ww[i-1][j][k] ) / (2.0*dx)
+                            + fabs(uu[i][j][k]) / 2.0 * ( ww[i+1][j][k] - 2.0*ww[i][j][k] + ww[i-1][j][k] ) / dx
+                            - vv[i][j][k] * ( ww[i][j+1][k] - ww[i][j-1][k] ) / (2.0*dy)
+                            + fabs(vv[i][j][k]) / 2.0 * ( ww[i][j+1][k] - 2.0*ww[i][j][k] + ww[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( ww[i][j][k+1] - ww[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( ww[i][j][k+1] - 2.0*ww[i][j][k] + ww[i][j][k-1] ) / dz
+                            - ( P[i][j+1][k] - P[i][j-1][k] ) / (2.0*dy)
+                            + 1.0/Re * (  ( ww[i+1][j][k] - 2.0*ww[i][j][k] + ww[i-1][j][k] ) / (dx*dx)
+                                        + ( ww[i][j+1][k] - 2.0*ww[i][j][k] + ww[i][j-1][k] ) / (dy*dy)
+                                        + ( ww[i][j][k+1] - 2.0*ww[i][j][k] + ww[i][j][k-1] ) / (dz*dz)
                                         )
                             );
                     
                     //ここにもTが必要
                     T[i][j][k] = TT[i][j][k]
-                    + dt * ( - uu[i][j][k] * ( TT[i+1][j][k] - TT[i-1][j][k] ) / (2.0*dx)
+                    + dt * (- uu[i][j][k] * ( TT[i+1][j][k] - TT[i-1][j][k] ) / (2.0*dx)
                             + fabs(uu[i][j][k]) / 2.0 * ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / dx
                             - vv[i][j][k] * ( TT[i][j+1][k] - TT[i][j-1][k] ) / (2.0*dy)
                             + fabs(vv[i][j][k]) / 2.0 * ( TT[i][j+1][k] - 2.0*TT[i][j][k] + TT[i][j-1][k] ) / dy
-                            + 1.0/(Re*Pr) * ( ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / (dx*dx)
+                            - ww[i][j][k] * ( TT[i][j][k+1] - TT[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( TT[i][j][k+1] - 2.0*TT[i][j][k] + TT[i][j][k-1] ) / dz
+                            + 1.0/(Re*Pr) * (  ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / (dx*dx)
                                              + ( TT[i][j+1][k] - 2.0*TT[i][j][k] + TT[i][j-1][k] ) / (dy*dy)
+                                             + ( TT[i][j][k+1] - 2.0*TT[i][j][k] + TT[i][j][k-1] ) / (dz*dz)
                                              )
                             );
                 }
