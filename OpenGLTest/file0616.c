@@ -16,18 +16,17 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define imax 50							// こうして#defineであらかじめ定義した文字は、以降の変数宣言時にこれらを使って値を代入しながら宣言できる？
+#define imax 50
 #define jmax 50
 
-double u[imax+1][jmax+1];					// この配列宣言を、main関数の中で変数宣言同様の位置に書くと上手くいかないかもしれない？
-double uu[imax+1][jmax+1];					// uuはuの時間的に一個手前のものとしてコピーするもの
+double u[imax+1][jmax+1];
+double uu[imax+1][jmax+1];
 double v[imax+1][jmax+1];
 double vv[imax+1][jmax+1];
 
 double P[imax+1][jmax+1];
 double T[imax+1][jmax+1];
 double TT[imax+1][jmax+1];
-
 
 /**draw関数*/
 void showData(int fileNo){
@@ -75,30 +74,23 @@ void calcData(){
     
     Re = 1000;
     Ra = 1000000.0;
-    Pr = 10.0;
+    Pr = 5.0;
     dx = 1.0 / (float)imax;
     dy = 1.0 / (float)jmax;
     dt = 0.05 * dx;							// 毎回このdtずつ足していく、その行為がN回行われる、よって最終的なtは(N-1)*dt
     
     N = (int)(10 / dt);						// 今は、結局N=200*imax=20000。ここで、int/(int)floatとしてしまうと分母0でエラー。
     
-    FILE *fp = fopen("test.csv", "w");
-    fprintf(fp, "t,x,y,u,v,P,val");
-    // u[i][j],v[i][j],P[i][j]の計算と書き込み、時刻n*dt=0(n=0)のとき
-    // 課題ノートの[1]
+
+    //境界条件
     n = 0;
     for(i = 0; i <= imax; i++){
         for(j = 0; j <= jmax; j++){
-            if(j < jmax) u[i][j] = 0;
-            else u[i][j] = 1;
             v[i][j] = 0;
             P[i][j] = 0;
-            //fprintf(fp, "%f,%f,%f,%f,%f,%f,\n", n*dt,i*dx, j*dy, u[i][j], v[i][j], P[i][j]);		// 書き込み
-            // pov-rayで読むために、書き込む文章中の数値の全ての最後にカンマをつける
-            // (t,x,y,u,v,P)と書く
+            T[i][j] = i < j ? 1 : 0;
         }
     }
-    //printf("第%d回目(時刻%f)　完了\n", n+1, n*dt);
     
     
     // u[i][j],v[i][j],P[i][j]の計算と書き込み、時刻n*dt(n=1,2,...,N-1)のとき
@@ -108,13 +100,23 @@ void calcData(){
             for(j = 0; j <= jmax; j++){
                 uu[i][j] = u[i][j];			// 全ての[i][j]で、uをコピーしておく
                 vv[i][j] = v[i][j];
+                TT[i][j] = T[i][j];
             }
         }
+
+        //kを入れた場合のfor文
+//        for (k=1;k<=kmax-1;k+=kmax-2){
+//            for (i=1; i<=imax-1; i++) {
+//                for (j=1; j<=; j) {
+//                    <#statements#>
+//                }
+//            }
+//        }
         
         for (i=2; i<= imax-2; i++) {
             for (j=2; j<= jmax-2; j++) {
-                float ududx = u[i][j] * (-u[i+2][j]+8*(u[i+1][j]-u[i-1][j])+u[i-2][j])/(12*dx) + (fabs(u[i][j])*powf(dx, 3)/12.0)*(u[i+2][j]-4*u[i+1][j]+6*u[i][j]-4*u[i-1][j]+u[i-2][j])/powf(dx, 4);//P183の7.75
-                float vdudy = v[i][j] * (-u[i][j+2]+8*(u[i][j+1]-u[i][j-1])+u[i][j-2])/(12*dy) + (fabs(v[i][j])*powf(dy, 3)/12.0)*(u[i][j+2]-4*u[i][j+1]+6*u[i][j]-4*u[i][j-1]+u[i][j-2])/powf(dy, 4);
+                float ududx = uu[i][j] * (-uu[i+2][j]+8*(uu[i+1][j]-uu[i-1][j])+uu[i-2][j])/(12*dx) + (fabs(uu[i][j])*powf(dx, 3)/12.0)*(uu[i+2][j]-4*uu[i+1][j]+6*uu[i][j]-4*uu[i-1][j]+uu[i-2][j])/powf(dx, 4);//P183の7.75
+                float vdudy = vv[i][j] * (-uu[i][j+2]+8*(uu[i][j+1]-uu[i][j-1])+uu[i][j-2])/(12*dy) + (fabs(vv[i][j])*powf(dy, 3)/12.0)*(uu[i][j+2]-4*uu[i][j+1]+6*uu[i][j]-4*uu[i][j-1]+uu[i][j-2])/powf(dy, 4);
                 float dPdx = (P[i+1][j]-P[i-1][j])/(2.0*dx);
                 float dx2 = dx*dx;
                 float dy2 = dy*dy;
@@ -122,12 +124,21 @@ void calcData(){
                 float d2udy2 = ( uu[i][j+1] - 2.0*uu[i][j] + uu[i][j-1] ) / dy2;
                 u[i][j] = uu[i][j] + dt*( -ududx -vdudy - dPdx + 1.0/Re*(d2udx2+d2udy2) );
                 
-                float udvdx = u[i][j] * (-v[i+2][j]+8*(v[i+1][j]-v[i-1][j])+v[i-2][j])/(12*dx) + (fabs(u[i][j])*powf(dx, 3)/12.0)*(v[i+2][j]-4*v[i+1][j]+6*v[i][j]-4*v[i-1][j]+v[i-2][j])/powf(dx, 4);//P183の7.75
-                float vdvdy = v[i][j] * (-v[i][j+2]+8*(v[i][j+1]-v[i][j-1])+v[i][j-2])/(12*dy) + (fabs(v[i][j])*powf(dy, 3)/12.0)*(v[i][j+2]-4*v[i][j+1]+6*v[i][j]-4*v[i][j-1]+v[i][j-2])/powf(dy, 4);//P183の7.75
+                float udvdx = uu[i][j] * (-vv[i+2][j]+8*(vv[i+1][j]-vv[i-1][j])+vv[i-2][j])/(12*dx) + (fabs(uu[i][j])*powf(dx, 3)/12.0)*(vv[i+2][j]-4*vv[i+1][j]+6*vv[i][j]-4*vv[i-1][j]+vv[i-2][j])/powf(dx, 4);//P183の7.75
+                float vdvdy = vv[i][j] * (-vv[i][j+2]+8*(vv[i][j+1]-vv[i][j-1])+vv[i][j-2])/(12*dy) + (fabs(vv[i][j])*powf(dy, 3)/12.0)*(vv[i][j+2]-4*vv[i][j+1]+6*vv[i][j]-4*vv[i][j-1]+vv[i][j-2])/powf(dy, 4);//P183の7.75
                 float dPdy = (P[i][j+1]-P[i][j-1])/(2.0*dy);
-                float d2vdx2 = ( uu[i+1][j] - 2.0*uu[i][j] + uu[i-1][j] ) / dx2;
-                float d2vdy2 = ( uu[i][j+1] - 2.0*uu[i][j] + uu[i][j-1] ) / dy2;
-                v[i][j] = vv[i][j] + dt*( -udvdx -vdvdy - dPdy + 1.0/Re*(d2vdx2+d2vdy2) );
+                float d2vdx2 = ( vv[i+1][j] - 2.0*vv[i][j] + vv[i-1][j] ) / dx2;
+                float d2vdy2 = ( vv[i][j+1] - 2.0*vv[i][j] + vv[i][j-1] ) / dy2;
+                v[i][j] = vv[i][j] + dt*( -udvdx -vdvdy -dPdy + 1.0/Re*(d2vdx2+d2vdy2) );
+                v[i][j] += (Ra/(Re*Re*Pr))*T[i][j];  //浮力項はwがないのでyにつける
+                
+                //上流差分
+                float udTdx  = uu[i][j] * (-TT[i+2][j]+8*(TT[i+1][j]-TT[i-1][j])+TT[i-2][j])/(12*dx) + (fabs(uu[i][j])*powf(dx, 3)/12.0)*(TT[i+2][j]-4*TT[i+1][j]+6*TT[i][j]-4*TT[i-1][j]+TT[i-2][j])/powf(dt, 4);//P183の7.75;
+                float vdTdy  = vv[i][j] * (-TT[i][j+2]+8*(TT[i][j+1]-TT[i][j-1])+TT[i][j-2])/(12*dy) + (fabs(vv[i][j])*powf(dy, 3)/12.0)*(TT[i][j+2]-4*TT[i][j+1]+6*TT[i][j]-4*TT[i][j-1]+TT[i][j-2])/powf(dy, 4);//P183の7.75;
+                float d2Tdx2 = ( TT[i+1][j] - 2.0*TT[i][j] + TT[i-1][j] ) / dx2;
+                float d2Tdy2 = ( TT[i][j+1] - 2.0*TT[i][j] + TT[i][j-1] ) / dy2;
+                
+                T[i][j] = TT[i][j] + dt * ( -udTdx - vdTdy + 1.0/(Re*Pr)*(d2Tdx2 + d2Tdy2));
             }
         }
         
@@ -143,6 +154,8 @@ void calcData(){
                                     + ( uu[i][j+1] - 2.0*uu[i][j] + uu[i][j-1] ) / (dy*dy)
                                     )
                         );
+                //非線形項の確認
+                //上流差分の式が二行に渡っている部分
                 v[i][j] = vv[i][j]
                 + dt * ( - uu[i][j] * ( vv[i+1][j] - vv[i-1][j] ) / (2.0*dx)
                         + fabs(uu[i][j]) / 2.0 * ( vv[i+1][j] - 2.0*vv[i][j] + vv[i-1][j] ) / dx
@@ -151,6 +164,17 @@ void calcData(){
                         - ( P[i][j+1] - P[i][j-1] ) / (2.0*dy)
                         + 1.0/Re * ( ( vv[i+1][j] - 2.0*vv[i][j] + vv[i-1][j] ) / (dx*dx)
                                     + ( vv[i][j+1] - 2.0*vv[i][j] + vv[i][j-1] ) / (dy*dy)
+                                    )
+                        );
+                
+                //ここにもTが必要
+                T[i][j] = TT[i][j]
+                + dt * ( - uu[i][j] * ( TT[i+1][j] - TT[i-1][j] ) / (2.0*dx)
+                        + fabs(uu[i][j]) / 2.0 * ( TT[i+1][j] - 2.0*TT[i][j] + TT[i-1][j] ) / dx
+                        - vv[i][j] * ( TT[i][j+1] - TT[i][j-1] ) / (2.0*dy)
+                        + fabs(vv[i][j]) / 2.0 * ( TT[i][j+1] - 2.0*TT[i][j] + TT[i][j-1] ) / dy
+                        + 1.0/(Re*Pr) * ( ( TT[i+1][j] - 2.0*TT[i][j] + TT[i-1][j] ) / (dx*dx)
+                                    + ( TT[i][j+1] - 2.0*TT[i][j] + TT[i][j-1] ) / (dy*dy)
                                     )
                         );
             }
@@ -178,13 +202,24 @@ void calcData(){
                                     + ( vv[i][j+1] - 2.0*vv[i][j] + vv[i][j-1] ) / (dy*dy)
                                     )
                         );
+                //ここにもTが必要
+                
+                //ここにもTが必要
+                T[i][j] = TT[i][j]
+                + dt * ( - uu[i][j] * ( TT[i+1][j] - TT[i-1][j] ) / (2.0*dx)
+                        + fabs(uu[i][j]) / 2.0 * ( TT[i+1][j] - 2.0*TT[i][j] + TT[i-1][j] ) / dx
+                        - vv[i][j] * ( TT[i][j+1] - TT[i][j-1] ) / (2.0*dy)
+                        + fabs(vv[i][j]) / 2.0 * ( TT[i][j+1] - 2.0*TT[i][j] + TT[i][j-1] ) / dy
+                        + 1.0/(Re*Pr) * ( ( TT[i+1][j] - 2.0*TT[i][j] + TT[i-1][j] ) / (dx*dx)
+                                         + ( TT[i][j+1] - 2.0*TT[i][j] + TT[i][j-1] ) / (dy*dy)
+                                         )
+                        );
             }
         }
         
-
         for(m = 0; m < 100; m++){
             for(i = 1; i < imax; i++){
-                for(j = 1; j < jmax; j++){
+                for(j = 1; j < jmax; j++){//ここにもkを足す
                     A = - 1.0 * ( u[i+1][j] - u[i-1][j] ) / (2.0*dx) * ( u[i+1][j] - u[i-1][j] ) / (2.0*dx)
                     - 1.0 * ( v[i][j+1] - v[i][j-1] ) / (2.0*dy) * ( v[i][j+1] - v[i][j-1] ) / (2.0*dy)
                     - 2.0 * ( u[i][j+1] - u[i][j-1] ) / (2.0*dy) * ( v[i+1][j] - v[i-1][j] ) / (2.0*dx)
@@ -205,6 +240,10 @@ void calcData(){
             P[i][jmax] = P[i][jmax-1];
         }
         
+        char filename[20] = {'\0'};
+        snprintf(filename, 20, "paraview_%d.csv",n);
+        FILE *fp = fopen(filename, "w");
+        fprintf(fp, "t,x,y,u,v,P,\n");
         // 時刻n*dt(第n回目時点)の書き込み
         int flag = 0;
         for(i = 0; i <= imax; i++){
@@ -219,13 +258,12 @@ void calcData(){
                 }
             }
         }
-        
+        fclose(fp);
         // 計算が長くなるため、コマンドプロンプトに進捗状況を表示させる
         // 今回は全部で20000回
         printf("%d/10000\n", n+1);
-//        printf("終了");
+        // printf("終了");
     }
-    fclose(fp);
     printf("終了");
 }
 
