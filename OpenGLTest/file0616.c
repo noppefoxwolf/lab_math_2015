@@ -63,7 +63,9 @@ void calcData(){
     for(i = 0; i <= imax; i++){
         for(j = 0; j <= jmax; j++){
             for (k = 0; k <= kmax; k++) {
+                u[i][j][k] = 0;
                 v[i][j][k] = 0;
+                w[i][j][k] = 0;
                 P[i][j][k] = 0;
                 T[i][j][k] = i < j ? 1 : 0;
             }
