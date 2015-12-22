@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D7361A2B1C2911D300BB6773 /* utility.c in Sources */ = {isa = PBXBuildFile; fileRef = D7361A2A1C2911D300BB6773 /* utility.c */; };
 		D73FCAF61ADC756700383EE1 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D73FCAF51ADC756700383EE1 /* OpenGL.framework */; };
 		D73FCAF81ADC756A00383EE1 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D73FCAF71ADC756A00383EE1 /* GLUT.framework */; };
 		D7905B671B1D3520006DA4FB /* file0616.c in Sources */ = {isa = PBXBuildFile; fileRef = D7905B651B1D3520006DA4FB /* file0616.c */; };
@@ -25,6 +26,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D7361A2A1C2911D300BB6773 /* utility.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = utility.c; sourceTree = "<group>"; };
 		D73FCAEB1ADC755500383EE1 /* OpenGLTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenGLTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D73FCAF51ADC756700383EE1 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		D73FCAF71ADC756A00383EE1 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
@@ -68,6 +70,7 @@
 			children = (
 				D7D1A4F91ADC96660092E2BE /* myglini.h */,
 				D7905B651B1D3520006DA4FB /* file0616.c */,
+				D7361A2A1C2911D300BB6773 /* utility.c */,
 			);
 			path = OpenGLTest;
 			sourceTree = "<group>";
@@ -128,6 +131,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D7361A2B1C2911D300BB6773 /* utility.c in Sources */,
 				D7905B671B1D3520006DA4FB /* file0616.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

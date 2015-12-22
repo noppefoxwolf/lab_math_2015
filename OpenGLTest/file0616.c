@@ -16,9 +16,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <dirent.h>
-#include <sys/stat.h>
-
 #include <time.h>
 #include <locale.h>
 
@@ -37,48 +34,8 @@ double P[imax+1][jmax+1][kmax+1];
 double T[imax+1][jmax+1][kmax+1];
 double TT[imax+1][jmax+1][kmax+1];
 
-void makeDir(char name[]){
-    struct stat buf;
-    int ret;
-    char dir[256];
-    char mkdir[512];
-    
-    snprintf(dir,256,"%s",name);
-    snprintf(mkdir,512,"mkdir %s",dir);
-    
-    ret=stat(dir, &buf);
-    
-    if(ret!=0){
-        
-        ret=system("ls");
-        
-        if(ret==0){
-            
-            ret=system(mkdir);
-            
-            if(ret==0){
-                
-                printf("\n\n");
-                printf("%sフォルダ作成成功! \n ",dir);
-                printf("\n\n ");
-                
-                ret=system("ls");
-                
-                if(ret!=0){
-                    printf("dirコマンド失敗! \n ");
-                }
-                
-            }else{
-                printf("%sフォルダ作成失敗! \n ",dir);
-            }
-            
-        }else{
-            printf("dirコマンド失敗! \n ");
-        }
-    }else{
-        printf("%sフォルダが存在します \n ",dir);
-    }
-}
+//include utility.c
+void makeDir(char[100]);
 
 void calcData(){
     struct tm *stm;
@@ -98,11 +55,6 @@ void calcData(){
     int i, j, k, n, m, N;					// 型の宣言時には、変数演算を用いて値を代入しながら宣言することはできない
     float dx, dy, dz, dt;						// したがってdxを用意した後dtを用意するとき、float dt=0.05*dx;とせず、float dt; dt=0.05*dx;とする
     double A, B;							// もしかしたら単純な数演算を用いて値を代入しながら宣言することはできるかも？つまり、int Re=10;は可能かも？
-    
-    //fp = fopen("oneper.txt", "w");			// この文は変数宣言の後に書くのが普通(もしかしたらFILE *fp;の直後でも大丈夫かもしれない)
-    // wはwrite、rならread、rwも可
-    // このファイルをpov-rayのフォルダに手動コピーしてあげよう
-    // プログラム上で日本語名フォルダを指定して移動させることはできないから
     
     Re = 1000;
     Ra = 1000000.0;
@@ -176,8 +128,7 @@ void calcData(){
                     float d2vdx2 = ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / dx2;
                     float d2vdy2 = ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / dy2;
                     float d2vdz2 = ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / dz2;
-                    v[i][j][k] = vv[i][j][k] + dt*( -udvdx -vdvdy -wdvdz -dPdy + 1.0/Re*(d2vdx2+d2vdy2+d2vdz2) );
-                    v[i][j][k] += (Ra/(Re*Re*Pr))*T[i][j][k];  //浮力項はwがないのでyにつける
+                    v[i][j][k] = vv[i][j][k] + dt*( -udvdx -vdvdy -wdvdz -dPdy + 1.0/Re*(d2vdx2+d2vdy2+d2vdz2) + (Ra/(Re*Re*Pr))*T[i][j][k]);//浮力
                     
                     float udwdx = uu[i][j][k] * (-ww[i+2][j][k]+8*(ww[i+1][j][k]-ww[i-1][j][k])+ww[i-2][j][k])/(12*dx) + (fabs(uu[i][j][k])*powf(dx, 3)/12.0)*(ww[i+2][j][k]-4*ww[i+1][j][k]+6*ww[i][j][k]-4*ww[i-1][j][k]+ww[i-2][j][k])/powf(dx, 4);//P183の7.75
                     float vdwdy = vv[i][j][k] * (-ww[i][j+2][k]+8*(ww[i][j+1][k]-ww[i][j-1][k])+ww[i][j-2][k])/(12*dy) + (fabs(vv[i][j][k])*powf(dy, 3)/12.0)*(ww[i][j+2][k]-4*ww[i][j+1][k]+6*ww[i][j][k]-4*ww[i][j-1][k]+ww[i][j-2][k])/powf(dy, 4);//P183の7.75
@@ -232,6 +183,7 @@ void calcData(){
                                         + ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / (dy*dy)
                                         + ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / (dz*dz)
                                         )
+                            + (Ra/(Re*Re*Pr))*T[i][j][k]
                             );
                     
                     w[i][j][k] = ww[i][j][k]
@@ -295,6 +247,7 @@ void calcData(){
                                         + ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / (dy*dy)
                                         + ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / (dz*dz)
                                         )
+                            + (Ra/(Re*Re*Pr))*T[i][j][k]
                             );
                     
                     w[i][j][k] = ww[i][j][k]
@@ -328,6 +281,72 @@ void calcData(){
             }
         }
         
+        
+        for (i=1;i<imax; i++){
+            for (j=1; j<jmax; j++) {
+                for (k=1; k<kmax; k+=kmax-2) {
+                    u[i][j][k] = uu[i][j][k]
+                    + dt * ( - uu[i][j][k] * ( uu[i+1][j][k] - uu[i-1][j][k] ) / (2.0*dx)
+                            + fabs(uu[i][j][k]) / 2.0 * ( uu[i+1][j][k] - 2.0*uu[i][j][k] + uu[i-1][j][k] ) / dx
+                            - vv[i][j][k] * ( uu[i][j+1][k] - uu[i][j-1][k] ) / (2.0*dy)
+                            + fabs(vv[i][j][k]) / 2.0 * ( uu[i][j+1][k] - 2.0*uu[i][j][k] + uu[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( uu[i][j][k+1] - uu[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( uu[i][j][k+1] - 2.0*uu[i][j][k] + uu[i][j][k-1] ) / dz
+                            - ( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx)
+                            + 1.0/Re * (  ( uu[i+1][j][k] - 2.0*uu[i][j][k] + uu[i-1][j][k] ) / (dx*dx)
+                                        + ( uu[i][j+1][k] - 2.0*uu[i][j][k] + uu[i][j-1][k] ) / (dy*dy)
+                                        + ( uu[i][j][k+1] - 2.0*uu[i][j][k] + uu[i][j][k-1] ) / (dz*dz)
+                                        )
+                            );
+                    //非線形項の確認
+                    //上流差分の式が二行に渡っている部分
+                    v[i][j][k] = vv[i][j][k]
+                    + dt * ( - uu[i][j][k] * ( vv[i+1][j][k] - vv[i-1][j][k] ) / (2.0*dx)
+                            + fabs(uu[i][j][k]) / 2.0 * ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / dx
+                            - vv[i][j][k] * ( vv[i][j+1][k] - vv[i][j-1][k] ) / (2.0*dy)
+                            + fabs(vv[i][j][k]) / 2.0 * ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( vv[i][j][k+1] - vv[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / dz
+                            - ( P[i][j+1][k] - P[i][j-1][k] ) / (2.0*dy)
+                            + 1.0/Re * (  ( vv[i+1][j][k] - 2.0*vv[i][j][k] + vv[i-1][j][k] ) / (dx*dx)
+                                        + ( vv[i][j+1][k] - 2.0*vv[i][j][k] + vv[i][j-1][k] ) / (dy*dy)
+                                        + ( vv[i][j][k+1] - 2.0*vv[i][j][k] + vv[i][j][k-1] ) / (dz*dz)
+                                        )
+                            + (Ra/(Re*Re*Pr))*T[i][j][k]
+                            );
+                    
+                    w[i][j][k] = ww[i][j][k]
+                    + dt * ( - uu[i][j][k] * ( ww[i+1][j][k] - ww[i-1][j][k] ) / (2.0*dx)
+                            + fabs(uu[i][j][k]) / 2.0 * ( ww[i+1][j][k] - 2.0*ww[i][j][k] + ww[i-1][j][k] ) / dx
+                            - vv[i][j][k] * ( ww[i][j+1][k] - ww[i][j-1][k] ) / (2.0*dy)
+                            + fabs(vv[i][j][k]) / 2.0 * ( ww[i][j+1][k] - 2.0*ww[i][j][k] + ww[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( ww[i][j][k+1] - ww[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( ww[i][j][k+1] - 2.0*ww[i][j][k] + ww[i][j][k-1] ) / dz
+                            - ( P[i][j+1][k] - P[i][j-1][k] ) / (2.0*dy)
+                            + 1.0/Re * (  ( ww[i+1][j][k] - 2.0*ww[i][j][k] + ww[i-1][j][k] ) / (dx*dx)
+                                        + ( ww[i][j+1][k] - 2.0*ww[i][j][k] + ww[i][j-1][k] ) / (dy*dy)
+                                        + ( ww[i][j][k+1] - 2.0*ww[i][j][k] + ww[i][j][k-1] ) / (dz*dz)
+                                        )
+                            );
+                    
+                    //ここにもTが必要
+                    T[i][j][k] = TT[i][j][k]
+                    + dt * (- uu[i][j][k] * ( TT[i+1][j][k] - TT[i-1][j][k] ) / (2.0*dx)
+                            + fabs(uu[i][j][k]) / 2.0 * ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / dx
+                            - vv[i][j][k] * ( TT[i][j+1][k] - TT[i][j-1][k] ) / (2.0*dy)
+                            + fabs(vv[i][j][k]) / 2.0 * ( TT[i][j+1][k] - 2.0*TT[i][j][k] + TT[i][j-1][k] ) / dy
+                            - ww[i][j][k] * ( TT[i][j][k+1] - TT[i][j][k-1] ) / (2.0*dz)
+                            + fabs(ww[i][j][k]) / 2.0 * ( TT[i][j][k+1] - 2.0*TT[i][j][k] + TT[i][j][k-1] ) / dz
+                            + 1.0/(Re*Pr) * (  ( TT[i+1][j][k] - 2.0*TT[i][j][k] + TT[i-1][j][k] ) / (dx*dx)
+                                             + ( TT[i][j+1][k] - 2.0*TT[i][j][k] + TT[i][j-1][k] ) / (dy*dy)
+                                             + ( TT[i][j][k+1] - 2.0*TT[i][j][k] + TT[i][j][k-1] ) / (dz*dz)
+                                             )
+                            );
+                }
+            }
+        }
+        
+        
         for(m = 0; m < 100; m++){
             for(i = 1; i < imax; i++){
                 for(j = 1; j < jmax; j++){//ここにもkを足す
@@ -347,7 +366,7 @@ void calcData(){
                                     ( u[i+1][j][k] - u[i-1][j][k] ) / (2.0*dx) +
                                     ( v[i][j+1][k] - v[i][j-1][k] ) / (2.0*dy) +
                                     ( w[i][j][k+1] - w[i][j][k-1] ) / (2.0*dz)
-                                    );//TODO
+                                    );
                         
                         B = - ( P[i+1][j][k] + P[i-1][j][k] ) / (dx*dx)
                             - ( P[i][j+1][k] + P[i][j-1][k] ) / (dy*dy)
@@ -381,14 +400,23 @@ void calcData(){
         char filename[100] = {'\0'};
         snprintf(filename, 100, "%s/paraview.csv.%d",dirName,n);
         FILE *fp = fopen(filename, "w");
-        fprintf(fp, "t,x,y,z,u,v,w,T,\n");
+        fprintf(fp, "t,x,y,z,T,\n");
         // 時刻n*dt(第n回目時点)の書き込み
         int flag = 0;
         for(i = 0; i <= imax; i++){
             for(j = 0; j <= jmax; j++){
                 for (k = 0; k <= kmax; k++) {
                     if (flag == 0){
-                        fprintf(fp, "%f,%f,%f,%f,%f,%f,%f,%f,\n", n*dt,i*dx,j*dy,k*dz,u[i][j][k],v[i][j][k],w[i][j][k], T[i][j][k]);
+                        //fprintf(fp, "%f,%f,%f,%f,%f,%f,%f,%f,\n", n*dt,i*dx,j*dy,k*dz,u[i][j][k],v[i][j][k],w[i][j][k], T[i][j][k]);
+                        fprintf(fp, "%f,%f,%f,%f,%f,\n", n*dt,i*dx,j*dy,k*dz,T[i][j][k]);
+                        printf("%f\n",T[i][j][k]);
+                        if (isnan(T[i][j][k])){
+                            printf("nan value ...\n");
+                            exit(0);
+                        }else if (isinf(T[i][j][k])){
+                            printf("inf value ...\n");
+                            exit(0);
+                        }
                         flag = 1;
                     }if (flag == 1){
                         flag = 2;
