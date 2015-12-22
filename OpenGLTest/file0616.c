@@ -16,6 +16,12 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include <dirent.h>
+#include <sys/stat.h>
+
+#include <time.h>
+#include <locale.h>
+
 #define imax 50
 #define jmax 50
 #define kmax 50
@@ -27,14 +33,65 @@ double vv[imax+1][jmax+1][kmax+1];
 double w[imax+1][jmax+1][kmax+1];
 double ww[imax+1][jmax+1][kmax+1];
 
-
 double P[imax+1][jmax+1][kmax+1];
 double T[imax+1][jmax+1][kmax+1];
 double TT[imax+1][jmax+1][kmax+1];
 
-
+void makeDir(char name[]){
+    struct stat buf;
+    int ret;
+    char dir[256];
+    char mkdir[512];
+    
+    snprintf(dir,256,"%s",name);
+    snprintf(mkdir,512,"mkdir %s",dir);
+    
+    ret=stat(dir, &buf);
+    
+    if(ret!=0){
+        
+        ret=system("ls");
+        
+        if(ret==0){
+            
+            ret=system(mkdir);
+            
+            if(ret==0){
+                
+                printf("\n\n");
+                printf("%sフォルダ作成成功! \n ",dir);
+                printf("\n\n ");
+                
+                ret=system("ls");
+                
+                if(ret!=0){
+                    printf("dirコマンド失敗! \n ");
+                }
+                
+            }else{
+                printf("%sフォルダ作成失敗! \n ",dir);
+            }
+            
+        }else{
+            printf("dirコマンド失敗! \n ");
+        }
+    }else{
+        printf("%sフォルダが存在します \n ",dir);
+    }
+}
 
 void calcData(){
+    struct tm *stm;
+    time_t tim;
+    char s[100];
+    setlocale( LC_ALL, "jpn" );
+    time( &tim );
+    stm = localtime( &tim );
+    strftime( s, 100, "%Y_%m_%d_%H_%M_%S", stm );
+    char dirName[100] = {'\0'};
+    snprintf(dirName, 100, "%s",s);
+    makeDir(dirName);
+    
     //レイノルズ数が大きいほど物質はさらさらする
     //風邪が吹くと物体の反対側で渦が生じ
     float Re, Ra, Pr;
@@ -321,8 +378,8 @@ void calcData(){
             }
         }
         
-        char filename[20] = {'\0'};
-        snprintf(filename, 20, "paraview_%d.csv",n);
+        char filename[100] = {'\0'};
+        snprintf(filename, 100, "%s/paraview.csv.%d",dirName,n);
         FILE *fp = fopen(filename, "w");
         fprintf(fp, "t,x,y,z,u,v,w,T,\n");
         // 時刻n*dt(第n回目時点)の書き込み
