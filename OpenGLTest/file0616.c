@@ -58,11 +58,11 @@ void calcData(){
     
     Re = 1000;
     Ra = 1000000.0;
-    Pr = 1.0;
+    Pr = 5.0;
     dx = 1.0 / (float)imax;
     dy = 1.0 / (float)jmax;
     dz = 1.0 / (float)kmax;
-    dt = 0.005 * dx;							// 毎回このdtずつ足していく、その行為がN回行われる、よって最終的なtは(N-1)*dt
+    dt = 0.05 * dx;							// 毎回このdtずつ足していく、その行為がN回行われる、よって最終的なtは(N-1)*dt
     
     N = (int)(10 / dt);						// 今は、結局N=200*imax=20000。ここで、int/(int)floatとしてしまうと分母0でエラー。
     
@@ -178,11 +178,11 @@ void calcData(){
                      + (fabs(vv[i][j][k]) / 2.0 * ( uu[i][j+1][k] - (2.0*uu[i][j][k]) + uu[i][j-1][k] ) / dy)
                      - (ww[i][j][k] * ( uu[i][j][k+1] - uu[i][j][k-1] ) / (2.0*dz))
                      + (fabs(ww[i][j][k]) / 2.0 * ( uu[i][j][k+1] - (2.0*uu[i][j][k]) + uu[i][j][k-1] ) / dz)
-                     - (( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx)))
+                     - (( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx))
                   + ((1.0/Re) * (  (( uu[i+1][j][k] - (2.0*uu[i][j][k]) + uu[i-1][j][k] ) / (dx*dx))
                               + (( uu[i][j+1][k] - (2.0*uu[i][j][k]) + uu[i][j-1][k] ) / (dy*dy))
                               + (( uu[i][j][k+1] - (2.0*uu[i][j][k]) + uu[i][j][k-1] ) / (dz*dz))
-                              )));
+                              ))));
                   //非線形項の確認
                   //上流差分の式が二行に渡っている部分
                   v[i][j][k] = vv[i][j][k]
@@ -241,11 +241,11 @@ void calcData(){
                            + (fabs(vv[i][j][k]) / 2.0 * ( uu[i][j+1][k] - (2.0*uu[i][j][k]) + uu[i][j-1][k] ) / dy)
                            - (ww[i][j][k] * ( uu[i][j][k+1] - uu[i][j][k-1] ) / (2.0*dz))
                            + (fabs(ww[i][j][k]) / 2.0 * ( uu[i][j][k+1] - (2.0*uu[i][j][k]) + uu[i][j][k-1] ) / dz)
-                           - (( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx)))
+                           - (( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx))
                      + ((1.0/Re) * (  (( uu[i+1][j][k] - (2.0*uu[i][j][k]) + uu[i-1][j][k] ) / (dx*dx))
                                     + (( uu[i][j+1][k] - (2.0*uu[i][j][k]) + uu[i][j-1][k] ) / (dy*dy))
                                     + (( uu[i][j][k+1] - (2.0*uu[i][j][k]) + uu[i][j][k-1] ) / (dz*dz))
-                                    )));
+                                    ))));
                   //非線形項の確認
                   //上流差分の式が二行に渡っている部分
                   v[i][j][k] = vv[i][j][k]
@@ -305,14 +305,14 @@ void calcData(){
                            + (fabs(vv[i][j][k]) / 2.0 * ( uu[i][j+1][k] - (2.0*uu[i][j][k]) + uu[i][j-1][k] ) / dy)
                            - (ww[i][j][k] * ( uu[i][j][k+1] - uu[i][j][k-1] ) / (2.0*dz))
                            + (fabs(ww[i][j][k]) / 2.0 * ( uu[i][j][k+1] - (2.0*uu[i][j][k]) + uu[i][j][k-1] ) / dz)
-                           - (( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx)))
+                           - (( P[i+1][j][k] - P[i-1][j][k] ) / (2.0*dx))
                      + (
                         (1.0/Re) * (  (( uu[i+1][j][k] - (2.0*uu[i][j][k]) + uu[i-1][j][k] ) / (dx*dx))
                                     + (( uu[i][j+1][k] - (2.0*uu[i][j][k]) + uu[i][j-1][k] ) / (dy*dy))
                                     + (( uu[i][j][k+1] - (2.0*uu[i][j][k]) + uu[i][j][k-1] ) / (dz*dz))
                                     )
                         )
-                     );
+                     ));
                   //非線形項の確認
                   //上流差分の式が二行に渡っている部分
                   v[i][j][k] = vv[i][j][k]
