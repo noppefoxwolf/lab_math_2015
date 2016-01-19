@@ -431,19 +431,19 @@ void calcData(){
       
       // 時刻n*dt(第n回目時点)の書き込み
       for(i = 0; i <= imax; i++){
-      for(j = 0; j <= jmax; j++){
-        for (k = 0; k <= kmax; k++) {
-        fprintf(fp, "%f,%f,%f,%f,%f,\n", n*dt,i*dx,j*dy,k*dz,T[i][j][k]);
-        //          printf("i(%d) : j(%d) : k(%d) :: %f\n",i,j,k,T[i][j][k]);
-        if (isnan(T[i][j][k])){
-          printf("nan value ...\n");
-          exit(0);
-        }else if (isinf(T[i][j][k])){
-          printf("inf value ...\n");
-          exit(0);
+        for(j = 0; j <= jmax; j++){
+          for (k = 0; k <= kmax; k++) {
+            fprintf(fp, "%f,%f,%f,%f,%f,\n", n*dt,i*dx,j*dy,k*dz,T[i][j][k]);
+            //          printf("i(%d) : j(%d) : k(%d) :: %f\n",i,j,k,T[i][j][k]);
+            if (isnan(T[i][j][k])){
+              printf("nan value ...\n");
+              exit(0);
+            }else if (isinf(T[i][j][k])){
+              printf("inf value ...\n");
+              exit(0);
+            }
+          }
         }
-        }
-      }
       }
       
       fclose(fp);
