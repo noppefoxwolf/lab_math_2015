@@ -55,6 +55,7 @@ void calcData(){
   int i, j, k, n, m, N;					// 型の宣言時には、変数演算を用いて値を代入しながら宣言することはできない
   float dx, dy, dz, dt;						// したがってdxを用意した後dtを用意するとき、float dt=0.05*dx;とせず、float dt; dt=0.05*dx;とする
   double A, B;							// もしかしたら単純な数演算を用いて値を代入しながら宣言することはできるかも？つまり、int Re=10;は可能かも？
+  float courseTime = 0.0;
   
   Re = 1000;
   Ra = 1000000.0;
@@ -64,7 +65,7 @@ void calcData(){
   dz = 1.0 / (float)kmax;
   dt = 0.05 * dx;							// 毎回このdtずつ足していく、その行為がN回行われる、よって最終的なtは(N-1)*dt
   
-  N = (int)(10 / dt);						// 今は、結局N=200*imax=20000。ここで、int/(int)floatとしてしまうと分母0でエラー。
+  N = (int)(10 / dt)*2;						// 今は、結局N=200*imax=20000。ここで、int/(int)floatとしてしまうと分母0でエラー。
   
 
   //境界条件
@@ -76,7 +77,10 @@ void calcData(){
         v[i][j][k] = 0;
         w[i][j][k] = 0;
         P[i][j][k] = 0;
-        T[i][j][k] = i < j ? 1 : 0;
+        T[i][j][k] = j < (jmax/2.0) ? 0.5 : 1.5;
+        if (j > (jmax/5*4) && i > (imax/5*2) && i < (imax/5*3)  && k > (kmax/5*2) && k < (kmax/5*3)) {
+          T[i][j][k] = 0;
+        }
       }
     }
   }
@@ -85,6 +89,10 @@ void calcData(){
   // u[i][j],v[i][j],P[i][j]の計算と書き込み、時刻n*dt(n=1,2,...,N-1)のとき
   // 課題ノートの、[2]~[4]の繰り返し
   for(n = 1; n < N; n++) {
+    time_t start_time;
+    start_time = time(NULL);
+    
+    
     for(i = 0; i <= imax; i++){
       for(j = 0; j <= jmax; j++){
         for (k = 0; k <= kmax; k++) {
@@ -450,9 +458,14 @@ void calcData(){
       
     }
     
-    // 計算が長くなるため、コマンドプロンプトに進捗状況を表示させる
-    // 今回は全部で20000回
-    printf("%d/4000\n", n+1);
+    //進捗報告
+    float diffTime = difftime(time(NULL), start_time);
+    courseTime += diffTime;
+    int second = (int)((float)(N-(n+1))*(courseTime/(float)n));
+    int time   = second / 3600;
+    int minute = (second - time * 3600) / 60;
+    second = second % 60;
+    printf("%d/%d 残り%d時間%d分%d秒\n", n+1,N,time,minute,second);
     // printf("終了");
   }
   printf("終了");
