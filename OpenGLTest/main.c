@@ -1,5 +1,5 @@
 //
-//  file0602.c
+//  main.c
 //  OpenGLTest
 //
 //  Created by Tomoya_Hirano on 6/2/15.
@@ -51,9 +51,9 @@ void calcData(){
   //レイノルズ数が大きいほど物質はさらさらする
   //風邪が吹くと物体の反対側で渦が生じ
   float Re, Ra, Pr;
-  int i, j, k, n, m, N;					// 型の宣言時には、変数演算を用いて値を代入しながら宣言することはできない
-  float dx, dy, dz, dt;					// したがってdxを用意した後dtを用意するとき、float dt=0.05*dx;とせず、float dt; dt=0.05*dx;とする
-  double A, B;                  // もしかしたら単純な数演算を用いて値を代入しながら宣言することはできるかも？つまり、int Re=10;は可能かも？
+  int i, j, k, n, m, N;					
+  float dx, dy, dz, dt;					
+  double A, B;
   float courseTime = 0.0;
   int skipRate = 20;
   
@@ -64,8 +64,8 @@ void calcData(){
   dx = 1.0 / (float)imax;
   dy = 1.0 / (float)jmax;
   dz = 1.0 / (float)kmax;
-  dt = 0.05 * dx;							// 毎回このdtずつ足していく、その行為がN回行われる、よって最終的なtは(N-1)*dt
-  N = (int)(10 / dt)*2;						// 今は、結局N=200*imax=20000。ここで、int/(int)floatとしてしまうと分母0でエラー。
+  dt = 0.05 * dx;						
+  N = (int)(10 / dt)*2;
 
   //境界条件
   n = 0;
@@ -84,12 +84,13 @@ void calcData(){
     }
   }
   
-  // u[i][j],v[i][j],P[i][j]の計算と書き込み、時刻n*dt(n=1,2,...,N-1)のとき
-  // 課題ノートの、[2]~[4]の繰り返し
+  //計算部分
   for(n = 1; n < N; n++) {
+    //開始時間を計測
     time_t start_time;
     start_time = time(NULL);
     
+    //コピー
     for(i = 0; i <= imax; i++){
       for(j = 0; j <= jmax; j++){
         for (k = 0; k <= kmax; k++) {
@@ -110,7 +111,7 @@ void calcData(){
       }
     }
     
-    //一次精度
+    //１次精度
     for (i=1; i< imax; i++) {//上下の部分を計算
       for (j=1; j< jmax; j+=jmax-2) {
         for (k=1; k< kmax; k++) {
@@ -218,7 +219,7 @@ void calcData(){
       fclose(fp);
     }
     
-    //進捗報告
+    //計算時間の計測と進捗の報告
     float diffTime = difftime(time(NULL), start_time);
     courseTime += diffTime;
     int second = (int)((float)(N-(n+1))*(courseTime/(float)n));
@@ -226,6 +227,7 @@ void calcData(){
     int minute = (second - time * 3600) / 60;
     second = second % 60;
     printf("%f％ 残り%d時間%d分%d秒\n", (float)(n+1)/(float)N,time,minute,second);
+    
   }
   printf("終了\n");
 }

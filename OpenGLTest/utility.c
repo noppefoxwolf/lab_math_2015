@@ -3,8 +3,6 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
-
-
 void makeDir(char name[]){
     struct stat buf;
     int ret;
