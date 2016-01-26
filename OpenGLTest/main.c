@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-
 #include <time.h>
 #include <locale.h>
 
@@ -32,11 +31,12 @@ double TT[imax+1][jmax+1][kmax+1];
 
 //include utility.c
 void makeDir(char[100]);
-
+//上流差分系
 void paud(int i,int j,int k,float dx, float dy, float dz, float dt, float Re, float Ra, float Pr);
 void taud(int i,int j,int k,float dx, float dy, float dz, float dt, float Re, float Ra, float Pr);
 
 void calcData(){
+  //今の時刻でディレクトリを作成する
   struct tm *stm;
   time_t tim;
   char s[100];
@@ -52,10 +52,12 @@ void calcData(){
   //風邪が吹くと物体の反対側で渦が生じ
   float Re, Ra, Pr;
   int i, j, k, n, m, N;					// 型の宣言時には、変数演算を用いて値を代入しながら宣言することはできない
-  float dx, dy, dz, dt;						// したがってdxを用意した後dtを用意するとき、float dt=0.05*dx;とせず、float dt; dt=0.05*dx;とする
-  double A, B;							// もしかしたら単純な数演算を用いて値を代入しながら宣言することはできるかも？つまり、int Re=10;は可能かも？
+  float dx, dy, dz, dt;					// したがってdxを用意した後dtを用意するとき、float dt=0.05*dx;とせず、float dt; dt=0.05*dx;とする
+  double A, B;                  // もしかしたら単純な数演算を用いて値を代入しながら宣言することはできるかも？つまり、int Re=10;は可能かも？
   float courseTime = 0.0;
+  int skipRate = 20;
   
+  //初期化
   Re = 1000;
   Ra = 1000000.0;
   Pr = 5.0;
@@ -63,7 +65,6 @@ void calcData(){
   dy = 1.0 / (float)jmax;
   dz = 1.0 / (float)kmax;
   dt = 0.05 * dx;							// 毎回このdtずつ足していく、その行為がN回行われる、よって最終的なtは(N-1)*dt
-  
   N = (int)(10 / dt)*2;						// 今は、結局N=200*imax=20000。ここで、int/(int)floatとしてしまうと分母0でエラー。
 
   //境界条件
@@ -83,13 +84,11 @@ void calcData(){
     }
   }
   
-  
   // u[i][j],v[i][j],P[i][j]の計算と書き込み、時刻n*dt(n=1,2,...,N-1)のとき
   // 課題ノートの、[2]~[4]の繰り返し
   for(n = 1; n < N; n++) {
     time_t start_time;
     start_time = time(NULL);
-    
     
     for(i = 0; i <= imax; i++){
       for(j = 0; j <= jmax; j++){
@@ -111,24 +110,21 @@ void calcData(){
       }
     }
     
-    
     //一次精度
-    for (i=1; i< imax; i++) {
-      for (j=1; j< jmax; j+=jmax-2) {//上下の部分を計算
+    for (i=1; i< imax; i++) {//上下の部分を計算
+      for (j=1; j< jmax; j+=jmax-2) {
         for (k=1; k< kmax; k++) {
           paud(i, j, k, dx, dy, dz, dt, Re, Ra, Pr);
         }
       }
     }
-    
-    for (i=1;i<imax; i+=imax-2){
-      for (j=1; j<jmax; j++) {//横の部分を計算
+    for (i=1;i<imax; i+=imax-2){//横の部分を計算
+      for (j=1; j<jmax; j++) {
         for (k=1; k<kmax; k++) {
           paud(i, j, k, dx, dy, dz, dt, Re, Ra, Pr);
         }
       }
     }
-    
     for (i=1;i<imax; i++) {
       for (j=1; j<jmax; j++) {
         for (k=1; k<kmax; k+=kmax-2) {
@@ -198,18 +194,16 @@ void calcData(){
       }
     }
     
-    if (n%20==0) {
+    //ファイルへの書き込み
+    if (n%skipRate==0) {
       char filename[100] = {'\0'};
       snprintf(filename, 100, "%s/paraview.csv.%d",dirName,n);
       FILE *fp = fopen(filename, "w");
       fprintf(fp, "t,x,y,z,T,\n");
-      
-      // 時刻n*dt(第n回目時点)の書き込み
       for(i = 0; i <= imax; i++){
         for(j = 0; j <= jmax; j++){
           for (k = 0; k <= kmax; k++) {
-            fprintf(fp, "%f,%f,%f,%f,%f,\n", n*dt,i*dx,j*dy,k*dz,T[i][j][k]);
-            //          printf("i(%d) : j(%d) : k(%d) :: %f\n",i,j,k,T[i][j][k]);
+            //validation
             if (isnan(T[i][j][k])){
               printf("nan value ...\n");
               exit(0);
@@ -217,6 +211,7 @@ void calcData(){
               printf("inf value ...\n");
               exit(0);
             }
+            fprintf(fp, "%f,%f,%f,%f,%f,\n", n*dt,i*dx,j*dy,k*dz,T[i][j][k]);
           }
         }
       }
