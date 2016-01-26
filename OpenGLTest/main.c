@@ -237,12 +237,13 @@ void calcData(){
 
 //三次精度上流差分
 void taud(int i,int j,int k,float dx, float dy, float dz, float dt, float Re, float Ra, float Pr){
+  //P183の7.75
   float ududx = uu[i][j][k] * (-uu[i+2][j][k]+(8*(uu[i+1][j][k]-uu[i-1][j][k]))+uu[i-2][j][k])/(12*dx)
-  + ((fabs(uu[i][j][k])*1.0/12.0)*(uu[i+2][j][k]-(4*uu[i+1][j][k])+(6*uu[i][j][k])-(4*uu[i-1][j][k])+uu[i-2][j][k])/dx);//P183の7.75
+    + ((fabs(uu[i][j][k])*1.0/12.0)*(uu[i+2][j][k]-(4*uu[i+1][j][k])+(6*uu[i][j][k])-(4*uu[i-1][j][k])+uu[i-2][j][k])/dx);
   float vdudy = vv[i][j][k] * (-uu[i][j+2][k]+(8*(uu[i][j+1][k]-uu[i][j-1][k]))+uu[i][j-2][k])/(12*dy)
-  + ((fabs(vv[i][j][k])*1.0/12.0)*(uu[i][j+2][k]-(4*uu[i][j+1][k])+(6*uu[i][j][k])-(4*uu[i][j-1][k])+uu[i][j-2][k])/dy);
+    + ((fabs(vv[i][j][k])*1.0/12.0)*(uu[i][j+2][k]-(4*uu[i][j+1][k])+(6*uu[i][j][k])-(4*uu[i][j-1][k])+uu[i][j-2][k])/dy);
   float wdudz = ww[i][j][k] * (-uu[i][j][k+2]+(8*(uu[i][j][k-1]-uu[i][j][k-1]))+uu[i][j][k-2])/(12*dz)
-  + ((fabs(ww[i][j][k])*1.0/12.0)*(uu[i][j][k+2]-(4*uu[i][j][k+1])+(6*uu[i][j][k])-(4*uu[i][j][k-1])+uu[i][j][k-2])/dz);
+    + ((fabs(ww[i][j][k])*1.0/12.0)*(uu[i][j][k+2]-(4*uu[i][j][k+1])+(6*uu[i][j][k])-(4*uu[i][j][k-1])+uu[i][j][k-2])/dz);
   float dPdx = (P[i+1][j][k]-P[i-1][j][k])/(2.0*dx);
   float dx2 = dx*dx;
   float dy2 = dy*dy;
@@ -254,23 +255,24 @@ void taud(int i,int j,int k,float dx, float dy, float dz, float dt, float Re, fl
   u[i][j][k] = uu[i][j][k] + (dt*( -ududx -vdudy -wdudz - dPdx + (1.0/Re*(d2udx2+d2udy2+d2udz2)) ));
   
   float udvdx = uu[i][j][k] * (-vv[i+2][j][k]+(8*(vv[i+1][j][k]-vv[i-1][j][k]))+vv[i-2][j][k])/(12*dx)
-  + ((fabs(uu[i][j][k])*1.0/12.0)*(vv[i+2][j][k]-(4*vv[i+1][j][k])+(6*vv[i][j][k])-(4*vv[i-1][j][k])+vv[i-2][j][k])/dx);//P183の7.75
+    + ((fabs(uu[i][j][k])*1.0/12.0)*(vv[i+2][j][k]-(4*vv[i+1][j][k])+(6*vv[i][j][k])-(4*vv[i-1][j][k])+vv[i-2][j][k])/dx);
   float vdvdy = vv[i][j][k] * (-vv[i][j+2][k]+(8*(vv[i][j+1][k]-vv[i][j-1][k]))+vv[i][j-2][k])/(12*dy)
-  + ((fabs(vv[i][j][k])*1.0/12.0)*(vv[i][j+2][k]-(4*vv[i][j+1][k])+(6*vv[i][j][k])-(4*vv[i][j-1][k])+vv[i][j-2][k])/dy);//P183の7.75
+    + ((fabs(vv[i][j][k])*1.0/12.0)*(vv[i][j+2][k]-(4*vv[i][j+1][k])+(6*vv[i][j][k])-(4*vv[i][j-1][k])+vv[i][j-2][k])/dy);
   float wdvdz = ww[i][j][k] * (-vv[i][j][k+2]+(8*(vv[i][j][k+1]-vv[i][j][k-1]))+vv[i][j][k-2])/(12*dz)
-  + ((fabs(ww[i][j][k])*1.0/12.0)*(vv[i][j][k+2]-(4*vv[i][j][k+1])+(6*vv[i][j][k])-(4*vv[i][j][k-1])+vv[i][j][k-2])/dz);
+    + ((fabs(ww[i][j][k])*1.0/12.0)*(vv[i][j][k+2]-(4*vv[i][j][k+1])+(6*vv[i][j][k])-(4*vv[i][j][k-1])+vv[i][j][k-2])/dz);
   float dPdy = (P[i][j+1][k]-P[i][j-1][k])/(2.0*dy);
   float d2vdx2 = ( vv[i+1][j][k] - (2.0*vv[i][j][k]) + vv[i-1][j][k] ) / dx2;
   float d2vdy2 = ( vv[i][j+1][k] - (2.0*vv[i][j][k]) + vv[i][j-1][k] ) / dy2;
   float d2vdz2 = ( vv[i][j][k+1] - (2.0*vv[i][j][k]) + vv[i][j][k-1] ) / dz2;
-  v[i][j][k] = vv[i][j][k] + (dt*( -udvdx -vdvdy -wdvdz -dPdy + (1.0/Re*(d2vdx2+d2vdy2+d2vdz2)) + ((Ra/(Re*Re*Pr))*T[i][j][k]) ));//浮力項
+  //浮力項
+  v[i][j][k] = vv[i][j][k] + (dt*( -udvdx -vdvdy -wdvdz -dPdy + (1.0/Re*(d2vdx2+d2vdy2+d2vdz2)) + ((Ra/(Re*Re*Pr))*T[i][j][k]) ));
   
   float udwdx = uu[i][j][k] * (-ww[i+2][j][k]+(8*(ww[i+1][j][k]-ww[i-1][j][k]))+ww[i-2][j][k])/(12*dx)
-  + ((fabs(uu[i][j][k])*1.0/12.0)*(ww[i+2][j][k]-(4*ww[i+1][j][k])+(6*ww[i][j][k])-(4*ww[i-1][j][k])+ww[i-2][j][k])/dx);//P183の7.75
+    + ((fabs(uu[i][j][k])*1.0/12.0)*(ww[i+2][j][k]-(4*ww[i+1][j][k])+(6*ww[i][j][k])-(4*ww[i-1][j][k])+ww[i-2][j][k])/dx);
   float vdwdy = vv[i][j][k] * (-ww[i][j+2][k]+(8*(ww[i][j+1][k]-ww[i][j-1][k]))+ww[i][j-2][k])/(12*dy)
-  + ((fabs(vv[i][j][k])*1.0/12.0)*(ww[i][j+2][k]-(4*ww[i][j+1][k])+(6*ww[i][j][k])-(4*ww[i][j-1][k])+ww[i][j-2][k])/dy);//P183の7.75
+    + ((fabs(vv[i][j][k])*1.0/12.0)*(ww[i][j+2][k]-(4*ww[i][j+1][k])+(6*ww[i][j][k])-(4*ww[i][j-1][k])+ww[i][j-2][k])/dy);
   float wdwdz = ww[i][j][k] * (-ww[i][j][k+2]+(8*(ww[i][j][k+1]-ww[i][j][k-1]))+ww[i][j][k-2])/(12*dz)
-  + ((fabs(ww[i][j][k])*1.0/12.0)*(ww[i][j][k+2]-(4*ww[i][j][k+1])+(6*ww[i][j][k])-(4*ww[i][j][k-1])+ww[i][j][k-2])/dz);
+    + ((fabs(ww[i][j][k])*1.0/12.0)*(ww[i][j][k+2]-(4*ww[i][j][k+1])+(6*ww[i][j][k])-(4*ww[i][j][k-1])+ww[i][j][k-2])/dz);
   float dPdz = (P[i][j][k+1]-P[i][j][k-1])/(2.0*dz);
   float d2wdx2 = ( ww[i+1][j][k] - (2.0*ww[i][j][k]) + ww[i-1][j][k] ) / dx2;
   float d2wdy2 = ( ww[i][j+1][k] - (2.0*ww[i][j][k]) + ww[i][j-1][k] ) / dy2;
@@ -280,11 +282,11 @@ void taud(int i,int j,int k,float dx, float dy, float dz, float dt, float Re, fl
   
   //上流差分
   float udTdx  = uu[i][j][k] * (-TT[i+2][j][k]+(8*(TT[i+1][j][k]-TT[i-1][j][k]))+TT[i-2][j][k])/(12*dx)
-  + ((fabs(uu[i][j][k])*1.0/12.0)*(TT[i+2][j][k]-(4*TT[i+1][j][k])+(6*TT[i][j][k])-(4*TT[i-1][j][k])+TT[i-2][j][k])/dt);//P183の7.75;
+    + ((fabs(uu[i][j][k])*1.0/12.0)*(TT[i+2][j][k]-(4*TT[i+1][j][k])+(6*TT[i][j][k])-(4*TT[i-1][j][k])+TT[i-2][j][k])/dt);
   float vdTdy  = vv[i][j][k] * (-TT[i][j+2][k]+(8*(TT[i][j+1][k]-TT[i][j-1][k]))+TT[i][j-2][k])/(12*dy)
-  + ((fabs(vv[i][j][k])*1.0/12.0)*(TT[i][j+2][k]-(4*TT[i][j+1][k])+(6*TT[i][j][k])-(4*TT[i][j-1][k])+TT[i][j-2][k])/dy);//P183の7.75;
+    + ((fabs(vv[i][j][k])*1.0/12.0)*(TT[i][j+2][k]-(4*TT[i][j+1][k])+(6*TT[i][j][k])-(4*TT[i][j-1][k])+TT[i][j-2][k])/dy);
   float wdTdy  = ww[i][j][k] * (-TT[i][j][k+2]+(8*(TT[i][j][k+1]-TT[i][j][k-1]))+TT[i][j][k-2])/(12*dz)
-  + ((fabs(ww[i][j][k])*1.0/12.0)*(TT[i][j][k+2]-(4*TT[i][j][k+1])+(6*TT[i][j][k])-(4*TT[i][j][k-1])+TT[i][j][k-2])/dz);//P183の7.75;
+    + ((fabs(ww[i][j][k])*1.0/12.0)*(TT[i][j][k+2]-(4*TT[i][j][k+1])+(6*TT[i][j][k])-(4*TT[i][j][k-1])+TT[i][j][k-2])/dz);
   float d2Tdx2 = ( TT[i+1][j][k] - (2.0*TT[i][j][k]) + TT[i-1][j][k] ) / dx2;
   float d2Tdy2 = ( TT[i][j+1][k] - (2.0*TT[i][j][k]) + TT[i][j-1][k] ) / dy2;
   float d2Tdz2 = ( TT[i][j][k+1] - (2.0*TT[i][j][k]) + TT[i][j][k-1] ) / dz2;
