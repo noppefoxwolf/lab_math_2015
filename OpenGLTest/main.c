@@ -6,11 +6,7 @@
 //  Copyright (c) 2015 Tomoya_Hirano. All rights reserved.
 //
 
-//#include <string.h>
-//#include <math.h>
-#include "myglini.h"
-//#define N 8
-//#define RHO 0.4
+#include "main.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -474,75 +470,4 @@ void calcData(){
 void mydraw(){
   //枠
   calcData();
-}
-
-//
-//void mydraw_xx(){
-//  double u[N+1], uu[N+1];				// N分割するから点はN+1個。uはn+1、uuはnのときのもの。
-//  float dx, dt;						// dx, dtをdoubleにしてしまうと、n>=1のときのu[j]の値がなぜかおかしくなる。
-//  int j, n;
-//  dx = 1.0 / (float)N / 2.0;				// 「x」は0～1。
-//  dt = dx * dx / 3.0 / 2.0;				// ρ=Δt/(Δx)^2=1/6にしたい
-//
-//  // 初期条件(すなわちn=0,t=0のとき。ここより、最初両端ではuは0になる。これをいじらなければずっと両端は0で出力される)
-//  for(j = 0; j <= N; j++){
-//    if(0 <= j && j <= N/2){
-//      u[j] = j * dx;			// 半分より左側
-//    }
-//    if(N/2 < j && j <= N ){
-//      u[j] = 1.0 - j * dx;		// 半分より右側
-//    }
-//    mypoint(j*dx, u[j], 1, 0, 0, 3);
-//    myline((j-1)*dx, u[j-1], (j)*dx, u[j], 1, 0, 0, 1);
-//  }
-//  
-//  // ここ以降で出力されるu[j]の値が、dx,dtがdoubleだとおかしくなってしまう。
-//  for(n = 1; n <= 1.0/dt; n++){		// dtは0未満の小数だから、1.0/dtは1より大きい
-//    for(j = 1; j < N; j++){
-//      uu[j] = u[j];				// u[j]の値をコピーしておく
-//    }
-//    for(j = 1; j < N; j++){			// 両端j=0,Nのときuは初期値0、これらはいじらなければ常に0
-//      u[j] = uu[j] + dt/(dx*dx) * (uu[j+1] - 2*uu[j] + uu[j-1]);		// dt/(dx*dx)は常に1.0/6.0だから、そう書いてもOK
-//      printf("%f\n",dt/(dx*dx));
-//      //u[j] = uu[j] + RHO * (uu[j+1] - 2*uu[j] + uu[j-1]);		// dt/(dx*dx)は常に1.0/6.0だから、そう書いてもOK
-//    }
-//    if(n%10 == 0){					// 出力される図がベタ塗りにならないように間引く
-//      for(j = 0; j <= N; j++){		// 両端j=0,Nのときも出力するため、出力のためのforを別個に作る
-//        printf("%f\n",u[j]);
-//        mypoint(j*dx, u[j], 1, 0, 0, 3);
-////        myline(j*dx, u[j], (j+1)*dx, u[j+1], 1, 0, 0, 1);
-//        myline((j-1)*dx, u[j-1], (j)*dx, u[j], 1, 0, 0, 1);
-//      }
-//    }
-//  }
-//}
-
-/**draw関数*/
-void showData(int fileNo){
-  char filename[10] = {'\0'};
-  snprintf(filename, 10, "%.d.txt", fileNo);
-  FILE *file;
-  if((file=fopen(filename,"r"))!=NULL){
-    double buf[6];
-    //ファイルが終わるまで読み込む
-    int index = 0;
-    double dt = 0.2;
-    while( fscanf(file,"%lf,%lf,%lf,%lf,%lf,%lf,",&buf[0],&buf[1],&buf[2],&buf[3],&buf[4],&buf[5]) != EOF ){
-      index++;
-      //if (index%4==0){//間引き
-      //myline(buf[1],buf[2], buf[1]+(dt*buf[3]),buf[2]+(dt*buf[4]),  1, 0, 0, 1);
-      powLine(buf[1],//x0
-          buf[2],//y0
-          buf[1]+(dt*buf[3]),//x1
-          buf[2]+(dt*buf[4]));//y1
-      //}
-      for(int i=0;i<10 ;i++){
-        char disp[12] = {'\0'};
-        snprintf(disp, 12, "t = %.03f", buf[0]);
-        glRasterPos3f(0.05*i - 0.5,-0.6,0);
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, disp[i]);
-      }
-    }
-    fclose(file);
-  }
 }
