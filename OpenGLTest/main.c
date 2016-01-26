@@ -62,7 +62,6 @@ void calcData(){
   dt = 0.05 * dx;							// 毎回このdtずつ足していく、その行為がN回行われる、よって最終的なtは(N-1)*dt
   
   N = (int)(10 / dt)*2;						// 今は、結局N=200*imax=20000。ここで、int/(int)floatとしてしまうと分母0でエラー。
-  
 
   //境界条件
   n = 0;
@@ -99,15 +98,6 @@ void calcData(){
         }
       }
     }
-
-    //kを入れた場合のfor文
-//    for (k=1;k<=kmax-1;k+=kmax-2){
-//      for (i=1; i<=imax-1; i++) {
-//        for (j=1; j<=; j) {
-//
-//        }
-//      }
-//    }
     
     //３次精度
     for (i=2; i<= imax-2; i++) {
@@ -461,10 +451,9 @@ void calcData(){
     int time   = second / 3600;
     int minute = (second - time * 3600) / 60;
     second = second % 60;
-    printf("%d/%d 残り%d時間%d分%d秒\n", n+1,N,time,minute,second);
-    // printf("終了");
+    printf("%f％ 残り%d時間%d分%d秒\n", (float)(n+1)/(float)N,time,minute,second);
   }
-  printf("終了");
+  printf("終了\n");
 }
 
 void mydraw(){
