@@ -352,7 +352,3 @@ void paud(int i,int j,int k,float dx, float dy, float dz, float dt, float Re, fl
            ));
 }
 
-void mydraw(){
-  //枠
-  calcData();
-}
