@@ -7,3 +7,15 @@ http://qiita.com/noppefoxwolf/private/7b7b26c468f19fa009e8
 http://qiita.com/noppefoxwolf/private/f649d90b2be824418670
 
 http://qiita.com/noppefoxwolf/private/2847017d675baeb9b762
+
+
+#HOW to use
+
+`git clone git@github.com:noppefoxwolf/lab_math_2015.git`
+
+`cd OpenGLTest`
+
+`gcc ./*`
+
+`./a.out`
+
