@@ -9,13 +9,14 @@ http://qiita.com/noppefoxwolf/private/f649d90b2be824418670
 http://qiita.com/noppefoxwolf/private/2847017d675baeb9b762
 
 
-#HOW to use
+#使い方
 
-`git clone git@github.com:noppefoxwolf/lab_math_2015.git`
+`$ git clone git@github.com:noppefoxwolf/lab_math_2015.git`
 
-`cd OpenGLTest`
+`$ cd OpenGLTest`
 
-`gcc ./*`
+`$ gcc ./*`
 
-`./a.out`
+`$ ./a.out`
 
+Macの場合は.xcodeprojをXcodeで起動して⌘+Rでビルド
