@@ -19,4 +19,6 @@ http://qiita.com/noppefoxwolf/private/2847017d675baeb9b762
 
 `$ ./a.out`
 
-Macの場合は.xcodeprojをXcodeで起動して⌘+Rでビルド
+#Xcodeを使う場合
+
+Macの場合は.xcodeprojをXcodeで起動して⌘+Rでビルドでも可
